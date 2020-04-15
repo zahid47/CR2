@@ -113,7 +113,6 @@ subjects = {
     4: ["SE211", "SE212", "SE213", "SE214", "SE215"]
 }
 
-subject_Columns = ["B", "E", "H", "K", "N", "Q"]
 routine = []  # list for now, will make it a dict later
 
 
@@ -124,16 +123,20 @@ def get_subjects_with_section(subjects_list, semester_no, section):
     return subjects_with_section
 
 
-def get_routine(semester_no, section, cs_major=False):
+def get_routine(semester_no, section, cs_major=False, tomorrow=False, day="today"):  # TODO use datetime to get today
 
     section = section.upper()
 
-    for column in subject_Columns:
-        for row_number in range(1, len(sheet["B"])):
-            subject = sheet[column + str(row_number)].value
-            # print(subject) # debug
+    for column in range(2, 18, 3):  # TODO need to change this "17" to len(). Find total no. of rows
+        for row in range(1, len(sheet["B"])):
+            subject = sheet.cell(row=row, column=column).value
+            # print(subject)  # debug
             if subject in get_subjects_with_section(subjects, semester_no, section):
                 routine.append(subject)
+                # routine.append(sheet.cell(row=row, column=column - 1).value) #  room no.
+                # routine.append(sheet.cell(row=row, column=column + 1).value) #  teacher name
     pprint(routine)
 
+
+get_routine(4, "c")
 
