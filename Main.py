@@ -115,24 +115,25 @@ subjects = {
 
 subject_Columns = ["B", "E", "H", "K", "N", "Q"]
 routine = []  # list for now, will make it a dict later
-length = len(sheet["B"])
 
 
-def get_routine(semester_no, sec, cs_major=False):
-
-    section = sec.upper()
+def get_subjects_with_section(subjects_list, semester_no, section):
     subjects_with_section = []
+    for subject in subjects_list[semester_no]:
+        subjects_with_section.append(subject + section)
+    return subjects_with_section
 
-    for subject in subjects[semester_no]:
-        subjects_with_section.append(subject + sec)
+
+def get_routine(semester_no, section, cs_major=False):
+
+    section = section.upper()
 
     for column in subject_Columns:
-        for row_number in range(1, length):
+        for row_number in range(1, len(sheet["B"])):
             subject = sheet[column + str(row_number)].value
-
-            if subject in subjects_with_section:
+            # print(subject) # debug
+            if subject in get_subjects_with_section(subjects, semester_no, section):
                 routine.append(subject)
     pprint(routine)
 
 
-get_routine(4, "C")
