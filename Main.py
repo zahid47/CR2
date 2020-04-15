@@ -7,7 +7,7 @@ from discord.ext import commands
 
 '''
 # Discord stuff
-TOKEN = "Njg5ODU5NjI2ODMyODg3ODg2.XnI_9g.a0J9Gp18W_RfksEhiJSH-_aln8o"
+TOKEN = ""
 client = commands.Bot(command_prefix="cr ")
 
 # send a msg when the bot is ready and set status
