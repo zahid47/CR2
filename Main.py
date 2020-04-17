@@ -116,6 +116,23 @@ subjects = {
 routine = []  # list for now, will make it a dict later
 
 
+def get_day_from_day_number(weekday_in_int):
+    if weekday_in_int == 0:
+        return "Monday"
+    elif weekday_in_int == 1:
+        return "Tuesday"
+    elif weekday_in_int == 2:
+        return "Wednesday"
+    elif weekday_in_int == 3:
+        return "Thursday"
+    elif weekday_in_int == 4:
+        return "Friday"
+    elif weekday_in_int == 5:
+        return "Saturday"
+    elif weekday_in_int == 6:
+        return "Sunday"
+
+
 def get_subjects_with_section(subjects_list, semester_no, section):
     subjects_with_section = []
     for subject in subjects_list[semester_no]:
@@ -123,20 +140,38 @@ def get_subjects_with_section(subjects_list, semester_no, section):
     return subjects_with_section
 
 
-def get_routine(semester_no, section, cs_major=False, tomorrow=False, day="today"):  # TODO use datetime to get today
+def get_routine(semester_no, section, cs_major=False, tomorrow=False,
+                day=get_day_from_day_number(datetime.datetime.now().weekday())):
 
     section = section.upper()
 
-    for column in range(2, 18, 3):  # TODO need to change this "17" to len(). Find total no. of rows
+    day = "Sunday"  # temp
+
+    tomorrow = "Monday"  # get_day_from_day_number(datetime.datetime.now().weekday())
+
+
+    '''
+    if tomorrow:  # == True
+        day = tomorrow'''
+
+    if day == "Friday":
+        return "No classes in Friday!"
+
+    for row_counter in range(1, len(sheet["B"])):
+        if sheet.cell(row=row_counter, column=1).value == day:
+            while sheet.cell(row=row_counter, column=1).value != tomorrow:
+                pprint(sheet.cell(row=row_counter + 1, column=2).value)
+                row_counter += 1
+
+    '''for column in range(2, 18, 3):  # TODO need to change this "18" to len(). Find total no. of rows
         for row in range(1, len(sheet["B"])):
             subject = sheet.cell(row=row, column=column).value
             # print(subject)  # debug
             if subject in get_subjects_with_section(subjects, semester_no, section):
                 routine.append(subject)
                 # routine.append(sheet.cell(row=row, column=column - 1).value) #  room no.
-                # routine.append(sheet.cell(row=row, column=column + 1).value) #  teacher name
-    pprint(routine)
+                # routine.append(sheet.cell(row=row, column=column + 1).value) #  teacher name'''
+    # return routine
 
 
 get_routine(4, "c")
-
