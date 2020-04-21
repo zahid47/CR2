@@ -1,177 +1,107 @@
 import datetime
 import openpyxl
-import requests
 from pprint import pprint
-import discord
-from discord.ext import commands
-
-'''
-# Discord stuff
-TOKEN = ""
-client = commands.Bot(command_prefix="cr ")
-
-# send a msg when the bot is ready and set status
-@client.event
-async def on_ready():
-    await client.change_presence(status=discord.Status.online, activity=discord.Game("cr routine"))
-    print("Sir, yes sir!")
-
-
-def day(weekday_in_int):
-    if weekday_in_int == 0:
-        return "Monday"
-    elif weekday_in_int == 1:
-        return "Tuesday"
-    elif weekday_in_int == 2:
-        return "Wednesday"
-    elif weekday_in_int == 3:
-        return "Thursday"
-    elif weekday_in_int == 4:
-        return "Friday"
-    elif weekday_in_int == 5:
-        return "Saturday"
-    elif weekday_in_int == 6:
-        return "Sunday"
-
-
-today = day(datetime.datetime.now().weekday())
-routine = {
-    "Monday": {},
-
-    "Tuesday": {0: {"sub": "Algorithm Design", "start_time": datetime.time(11, 30),
-                    "end_time": datetime.time(1, 00), "room": "604 AB", "teacher": "MAH"},
-
-                1: {"sub": "Digital Electronics", "start_time": datetime.time(1, 00),
-                    "end_time": datetime.time(2, 30), "room": "601 AB", "teacher": "KS"},
-
-                2: {"sub": "Object Oriented Concepts", "start_time": datetime.time(2, 30),
-                    "end_time": datetime.time(4, 00), "room": "404 AB", "teacher": "FAH"}
-                },
-
-    "Wednesday": {0: {"sub": "Digital Electronics", "start_time": datetime.time(1, 00),
-                      "end_time": datetime.time(2, 30), "room": "601 AB", "teacher": "KS"},
-
-                  1: {"sub": "Algorithm Design", "start_time": datetime.time(2, 30),
-                      "end_time": datetime.time(4, 00), "room": "601 AB", "teacher": "MAH"}
-                  },
-
-    "Thursday": {},
-
-    "Friday": {},
-
-    "Saturday": {0: {"sub": "Software Requirements", "start_time": datetime.time(11, 00),
-                     "end_time": datetime.time(1, 00), "room": "607 AB", "teacher": "MMR"},
-
-                 1: {"sub": "Object Oriented Concepts", "start_time": datetime.time(2, 30),
-                     "end_time": datetime.time(4, 00), "room": "404 AB", "teacher": "FAH"}
-                 },
-
-    "Sunday": {0: {"sub": "Software Requirements", "start_time": datetime.time(1, 00),
-                   "end_time": datetime.time(2, 30), "room": "406 AB", "teacher": "MMR"},
-
-               1: {"sub": "Algorithm Design LAB 1", "start_time": datetime.time(2, 30),
-                   "end_time": datetime.time(4, 00), "room": "404 AB", "teacher": "MAH"},
-
-               2: {"sub": "Algorithm Design LAB 2", "start_time": datetime.time(4, 00),
-                   "end_time": datetime.time(5, 30), "room": "404 AB", "teacher": "MAH"}
-               }
-}
-
-no_of_classes = len(routine[today])
-subject = []
-start_time = []
-end_time = []
-room = []
-teacher = []
-for serial in range(no_of_classes):
-    subject.append(routine[today][serial]['sub'])
-    start_time.append(routine[today][serial]['start_time'])
-    end_time.append(routine[today][serial]['end_time'])
-    room.append(routine[today][serial]['room'])
-    teacher.append(routine[today][serial]['teacher'])
-
-# [MAIN FUNCTIONALITY]
-@client.command(aliases=["today"])
-async def routine(ctx):
-    await ctx.send(f"You have {no_of_classes} class(es) in {today}.")
-    for serial in range(no_of_classes):
-        await ctx.send(f"`{subject[serial]}`\nFrom {start_time[serial]} to {end_time[serial]} | Room: {room[serial]} | "
-                       f"Teacher: {teacher[serial]}")
-
-# TODO add a command "tomorrow routine"
-
-# run the bot
-client.run(TOKEN)
-'''
 
 # opening an excel file and selecting the first sheet which is named "Sheet1"
-workbook = openpyxl.load_workbook("routine_v4.xlsx")
+workbook = openpyxl.load_workbook("sample_routine.xlsx")
 sheet = workbook["Sheet1"]
 
-# dictionary that contains subject codes according to semester number
+# dictionary that contains sub codes, key = semester no., value = list of sub codes
 subjects = {
-    4: ["SE211", "SE212", "SE213", "SE214", "SE215"]
+    4: ["SE211", "SE212", "SE213", "SE214", "SE215", "CS211"],
+    5: ["SE221", "SE223", "SE224", "SE225", "SE226", "SE222"]
 }
 
-routine = []  # list for now, will make it a dict later
 
-
-def get_day_from_day_number(weekday_in_int):
-    if weekday_in_int == 0:
+def get_day(day_number):
+    if day_number == 0:
         return "Monday"
-    elif weekday_in_int == 1:
+    elif day_number == 1:
         return "Tuesday"
-    elif weekday_in_int == 2:
+    elif day_number == 2:
         return "Wednesday"
-    elif weekday_in_int == 3:
+    elif day_number == 3:
         return "Thursday"
-    elif weekday_in_int == 4:
+    elif day_number == 4:
         return "Friday"
-    elif weekday_in_int == 5:
+    elif day_number == 5:
         return "Saturday"
-    elif weekday_in_int == 6:
+    elif day_number == 6:
         return "Sunday"
 
 
-def get_subjects_with_section(subjects_list, semester_no, section):
+def get_day_number(day):
+    if day == "Monday":
+        return 0
+    elif day == "Tuesday":
+        return 1
+    elif day == "Wednesday":
+        return 2
+    elif day == "Thursday":
+        return 3
+    elif day == "Friday":
+        return 4
+    elif day == "Saturday":
+        return 5
+    elif day == "Sunday":
+        return 6
+
+
+def get_subjects_with_section(subjects_list, semester, section):
+    section = section.upper()
     subjects_with_section = []
-    for subject in subjects_list[semester_no]:
+    for subject in subjects_list[semester]:
         subjects_with_section.append(subject + section)
     return subjects_with_section
 
 
-def get_routine(semester_no, section, cs_major=False, tomorrow=False,
-                day=get_day_from_day_number(datetime.datetime.now().weekday())):
-
+def get_routine(semester, section, want_tomorrow=False, cs_major=False, day=get_day(datetime.datetime.now().weekday())):
     section = section.upper()
+    routine = {}
+    no_of_subs = []
 
-    day = "Sunday"  # temp
+    # day = "Sunday"  # temp
 
-    tomorrow = "Monday"  # get_day_from_day_number(datetime.datetime.now().weekday())
+    if want_tomorrow:  # == True
+        day = get_day(datetime.datetime.now().weekday() + 1)
+
+    tomorrow = get_day(get_day_number(day) + 1)
+
+    # print(f"Today = {day}")  # debug
+    # print(f"Tomorrow = {tomorrow}")  # debug
+
+    row_length = len(sheet["A"])
+    col_length = len(sheet[1])
+
+    # print(row_length)  # debug
+    # print(col_length)  # debug
+
+    for row in range(1, row_length):  # traversing rows from top-down
+
+        if sheet.cell(row=row, column=1).value == day:  # we found the day! also, day name always in first column(col=1)
+
+            while sheet.cell(row=row, column=1).value != tomorrow:  # stop when we reach next day!
+
+                # now we are inside today's routine in the excel file
+
+                for column in range(2, col_length, 3):
+                    sub = sheet.cell(row=row, column=column).value
+
+                    if sub in get_subjects_with_section(subjects, semester, section):
+                        no_of_subs.append(sub)
+
+                        for sub_serial in range(len(no_of_subs)):
+                            routine[sub_serial] = {}
+                            routine[sub_serial]["Subject_code"] = sub
+                            routine[sub_serial]["Room"] = sheet.cell(row=row, column=column - 1).value
+                            routine[sub_serial]["Teacher"] = sheet.cell(row=row, column=column + 1).value
+                            routine[sub_serial]["Time"] = sheet.cell(row=4, column=column - 1).value
+
+                row += 1
+
+    if len(routine) == 0:
+        return f"No classes in {day}!"
+    return routine
 
 
-    '''
-    if tomorrow:  # == True
-        day = tomorrow'''
-
-    if day == "Friday":
-        return "No classes in Friday!"
-
-    for row_counter in range(1, len(sheet["B"])):
-        if sheet.cell(row=row_counter, column=1).value == day:
-            while sheet.cell(row=row_counter, column=1).value != tomorrow:
-                pprint(sheet.cell(row=row_counter + 1, column=2).value)
-                row_counter += 1
-
-    '''for column in range(2, 18, 3):  # TODO need to change this "18" to len(). Find total no. of rows
-        for row in range(1, len(sheet["B"])):
-            subject = sheet.cell(row=row, column=column).value
-            # print(subject)  # debug
-            if subject in get_subjects_with_section(subjects, semester_no, section):
-                routine.append(subject)
-                # routine.append(sheet.cell(row=row, column=column - 1).value) #  room no.
-                # routine.append(sheet.cell(row=row, column=column + 1).value) #  teacher name'''
-    # return routine
-
-
-get_routine(4, "c")
+pprint(get_routine(4, "c"))
