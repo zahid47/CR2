@@ -56,11 +56,10 @@ def get_subjects_with_section(subjects_list, semester, section):
 
 
 def get_routine(semester, section, want_tomorrow=False, cs_major=False, day=get_day(datetime.datetime.now().weekday())):
+    result = []
     section = section.upper()
     routine = {}
-    no_of_subs = []
-
-    # day = "Sunday"  # temp
+    # no_of_subs = []
 
     if want_tomorrow:  # == True
         day = get_day(datetime.datetime.now().weekday() + 1)
@@ -88,20 +87,37 @@ def get_routine(semester, section, want_tomorrow=False, cs_major=False, day=get_
                     sub = sheet.cell(row=row, column=column).value
 
                     if sub in get_subjects_with_section(subjects, semester, section):
-                        no_of_subs.append(sub)
+                        # no_of_subs.append(sub)
 
+                        time = sheet.cell(row=4, column=column - 1).value
+                        room = sheet.cell(row=row, column=column - 1).value
+                        teacher = sheet.cell(row=row, column=column + 1).value
+
+                        result.append(f"Time: {time}, Subject: {sub}, Room: {room}, Teacher: {teacher}")
+
+                        '''
                         for sub_serial in range(len(no_of_subs)):
                             routine[sub_serial] = {}
                             routine[sub_serial]["Subject_code"] = sub
                             routine[sub_serial]["Room"] = sheet.cell(row=row, column=column - 1).value
                             routine[sub_serial]["Teacher"] = sheet.cell(row=row, column=column + 1).value
-                            routine[sub_serial]["Time"] = sheet.cell(row=4, column=column - 1).value
+                            routine[sub_serial]["Time"] = sheet.cell(row=4, column=column - 1).value '''
 
                 row += 1
 
+    '''
     if len(routine) == 0:
         return f"No classes in {day}!"
-    return routine
+    return routine'''
+
+    if len(result) == 0:
+        return f"No classes in {day}!"
+    return result
 
 
-pprint(get_routine(4, "c"))
+no_of_classes = len(get_routine(4, "c"))
+
+print(f"You have {no_of_classes} class(es) in {get_day(datetime.datetime.now().weekday())}.\n")
+
+for entry in get_routine(4, "d"):
+    print(entry)
