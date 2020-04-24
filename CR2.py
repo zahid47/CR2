@@ -45,6 +45,14 @@ def get_day_number(day):
         return 5
     elif day == "Sunday":
         return 6
+    
+    
+def get_tomorrow(day):
+    
+    if day == "Sunday":
+        return "Monday"
+    else:
+        return get_day(get_day_number(day) + 1)
 
 
 def get_subjects_with_section(subjects_list, semester, section):
@@ -57,71 +65,92 @@ def get_subjects_with_section(subjects_list, semester, section):
 
 def get_routine(semester, section, want_tomorrow=False, cs_major=False, day=get_day(datetime.datetime.now().weekday())):
 
-    global start_row, end_row
-    section = section.upper()
+    try:
+        global start_row, end_row
+        section = section.upper()
+        routine = {}
+        rows_that_have_sub_names = [2, 5, 8, 11, 14, 17]
 
-    routine = {}
+        # day = "Friday"  # debug
 
-    rows_that_have_sub_names = [2, 5, 8, 11, 14, 17]
-    # times = ["08:30-10:00", "10:00-11:30", "11.30-01:00", "01:00-2:30", "2:30-4:00", "4:00-5:30"]
+        if want_tomorrow:  # == True
+            day = get_day(datetime.datetime.now().weekday() + 1)
 
-    if want_tomorrow:  # == True
-        day = get_day(datetime.datetime.now().weekday() + 1)
+        tomorrow = get_tomorrow(day)
 
-    day = "Saturday"
+        # print(f"Today = {day}")  # debug
+        # print(f"Tomorrow = {tomorrow}")  # debug
 
-    tomorrow = get_day(get_day_number(day) + 1)
+        row_length = len(sheet["A"])
+        # col_length = len(sheet[1])  # // 4
 
-    # print(f"Today = {day}")  # debug
-    # print(f"Tomorrow = {tomorrow}")  # debug
+        # print(row_length)  # debug
+        # print(col_length)  # debug
 
-    row_length = len(sheet["A"])
-    # col_length = len(sheet[1])  # // 4
+        # finding start and end row of today
+        row = 1
+        while row != row_length + 1:  # traversing rows from top-down
+            if sheet.cell(row=row, column=1).value == day:  # we found the day! day name always in first column(col=1)
+                start_row = row
+            if sheet.cell(row=row, column=1).value == tomorrow:  # we found the next day! This is where we stop
+                end_row = row
 
-    # print(row_length)  # debug
-    # print(col_length)  # debug
+            row += 1
 
-    row = 1
-    while row != row_length + 1:  # traversing rows from top-down
-        if sheet.cell(row=row, column=1).value == day:  # we found the day! also, day name always in first column(col=1)
-            start_row = row
-        if sheet.cell(row=row, column=1).value == tomorrow:  # we found the next day! This is where we stop
-            end_row = row
+        # print(start_row)  # debug
+        # print(end_row)  # debug
 
-        row += 1
+        dict_counter = 1
+        for a_row_that_have_sub_name in rows_that_have_sub_names:  # traversing columns with sub names from left-right
 
-    # print(start_row)  # debug
-    # print(end_row)  # debug
+            counter = start_row  # setting counter = start_row every time we finish a column & move to next time frame
 
-    dict_counter = 1
-    for a_row_that_have_sub_name in rows_that_have_sub_names:  # traversing columns that have sub names from left-right
+            while counter < end_row:  # scan one time frame to see if there is a class in that time
 
-        counter = start_row  # setting counter = start_row every time we finish a column & move to next time frame
+                sub = sheet.cell(row=counter, column=a_row_that_have_sub_name).value
 
-        while counter < end_row:  # scan one time frame to see if there is a class in that time
+                if sub in get_subjects_with_section(subjects, semester, section):
 
-            sub = sheet.cell(row=counter, column=a_row_that_have_sub_name).value
+                    routine[dict_counter] = {}
 
-            if sub in get_subjects_with_section(subjects, semester, section):
+                    subject = sub
+                    time = sheet.cell(row=4, column=a_row_that_have_sub_name - 1).value
+                    room = sheet.cell(row=counter, column=a_row_that_have_sub_name - 1).value
+                    teacher = sheet.cell(row=counter, column=a_row_that_have_sub_name + 1).value
 
-                routine[dict_counter] = {}
+                    routine[dict_counter]["day"] = day
+                    routine[dict_counter]["time"] = time
+                    routine[dict_counter]["subject"] = subject
+                    routine[dict_counter]["room"] = room
+                    routine[dict_counter]["teacher"] = teacher
 
-                subject = sub
-                time = sheet.cell(row=4, column=a_row_that_have_sub_name - 1).value
-                room = sheet.cell(row=counter, column=a_row_that_have_sub_name - 1).value
-                teacher = sheet.cell(row=counter, column=a_row_that_have_sub_name + 1).value
+                    dict_counter += 1
 
-                routine[dict_counter]["time"] = time
-                routine[dict_counter]["subject"] = subject
-                routine[dict_counter]["room"] = room
-                routine[dict_counter]["teacher"] = teacher
+                counter += 1
 
-                dict_counter += 1
-
-            counter += 1
+    except:
+        routine = {}
 
     return routine
 
 
-result = get_routine(4, "c")
-pprint(result)
+# Running the program
+while True:
+    try:
+        semester = int(input("Enter semester no: "))
+    except ValueError:
+        print("Please enter an integer.")
+        semester = 0
+    if semester != 0:
+        break
+
+result = get_routine(semester, input("Enter section: "))
+# pprint(result)
+print(f'You have {len(result)} class(es) today.')
+print("_____________")
+for cls in range(1, len(result)+1):
+    print(f'Time: {result[cls]["time"]}')
+    print(f'Subject: {result[cls]["subject"]}')
+    print(f'Room: {result[cls]["room"]}')
+    print(f'Teacher: {result[cls]["teacher"]}')
+    print("_____________")
