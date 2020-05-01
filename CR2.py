@@ -1,5 +1,9 @@
 import datetime
 import openpyxl
+# import fbchat
+from fbchat import Client
+from fbchat.models import *
+import requests
 from pprint import pprint
 
 # opening an excel file and selecting the first sheet which is named "Sheet1"
@@ -8,8 +12,18 @@ sheet = workbook["Sheet1"]
 
 # dictionary that contains sub codes, key = semester no., value = list of sub codes
 subjects = {
+    1: ["SE111", "SE112", "SE113", "ENG101"],  # TODO AOL will be added manually
+    2: ["SE121", "SE122", "SE123", "MAT101", "PHY101"],
+    3: ["SE131", "SE132", "SE133", "MAT102", "STA101"],
     4: ["SE211", "SE212", "SE213", "SE214", "SE215", "CS211"],
-    5: ["SE221", "SE223", "SE224", "SE225", "SE226", "SE222"]
+    5: ["SE 221", "SE 222", "SE 223", "SE 224", "SE 225", "SE 226", "SE 532"],
+    6: ["SE 231", "SE 232", "SE 233", "SE 234", "SE 235"],
+    7: ["SE 225", "SE 226", "SE 311", "SE 312", "SE 313", "CS 312", "GED"],
+    8: ["SE 312", "SE 322", "SE 323", "SE 442", "SE 341", "CS 323"],
+    9: ["SWE412", "SWE331", "SWE423", "SWE424"],
+    10: ["SWE422", "SWE425", "SWE426", "SWE332"],
+    11: ["SWE411", "SWE439"],
+    12: []
 }
 
 
@@ -71,7 +85,7 @@ def get_routine(semester, section, want_tomorrow=False, cs_major=False, day=get_
         routine = {}
         rows_that_have_sub_names = [2, 5, 8, 11, 14, 17]
 
-        # day = "Friday"  # debug
+        day = "Monday"  # debug
 
         if want_tomorrow:  # == True
             day = get_day(datetime.datetime.now().weekday() + 1)
@@ -109,6 +123,8 @@ def get_routine(semester, section, want_tomorrow=False, cs_major=False, day=get_
 
                 sub = sheet.cell(row=counter, column=a_row_that_have_sub_name).value
 
+                # if semester == 1 and sub == "AOL101(A,B,D)" and section == "A" or "B" or "C":
+
                 if sub in get_subjects_with_section(subjects, semester, section):
 
                     routine[dict_counter] = {}
@@ -134,23 +150,49 @@ def get_routine(semester, section, want_tomorrow=False, cs_major=False, day=get_
     return routine
 
 
-# Running the program
-while True:
-    try:
-        semester = int(input("Enter semester no: "))
-    except ValueError:
-        print("Please enter an integer.")
-        semester = 0
-    if semester != 0:
-        break
+def main():
 
-result = get_routine(semester, input("Enter section: "))
-# pprint(result)
-print(f'You have {len(result)} class(es) today.')
-print("_____________")
-for cls in range(1, len(result)+1):
-    print(f'Time: {result[cls]["time"]}')
-    print(f'Subject: {result[cls]["subject"]}')
-    print(f'Room: {result[cls]["room"]}')
-    print(f'Teacher: {result[cls]["teacher"]}')
+    while True:
+        try:
+            semester_no = int(input("Enter semester no (1-11): "))
+        except ValueError:
+            print("Please enter an integer.")
+            semester_no = 0
+
+        if not 0 < semester_no < 12:
+            print("Please enter a valid semester number (1-11). Semester 12 isn't supported.")
+            continue
+        if semester_no != 0:
+            break
+
+    result = get_routine(semester_no, input("Enter section: "))
+    # pprint(result)
+    print(f'You have {len(result)} class(es) today.')
     print("_____________")
+    for cls in range(1, len(result)+1):
+        print(f'Time: {result[cls]["time"]}')
+        print(f'Subject: {result[cls]["subject"]}')
+        print(f'Room: {result[cls]["room"]}')
+        print(f'Teacher: {result[cls]["teacher"]}')
+        print("_____________")
+
+    '''
+    # fbchat stuff
+    with open("email.txt") as email:
+        email = email.read()
+    with open("password.txt") as password:
+        password = password.read()
+    
+    client = Client(email, password)
+    
+    if not client.isLoggedIn():
+        client.login(email, password)
+    
+    # stuff here
+    
+    client.logout()
+    '''
+
+
+if __name__ == "__main__":
+    main()
