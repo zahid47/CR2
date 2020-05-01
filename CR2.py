@@ -176,6 +176,7 @@ def main():
         print(f'Teacher: {result[cls]["teacher"]}')
         print("_____________")
 
+    # TODO downgrade to py 3.6 and add fbchat functionality
     '''
     # fbchat stuff
     with open("email.txt") as email:
