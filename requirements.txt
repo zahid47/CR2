@@ -1,4 +1,2 @@
 openpyxl
-discord
-fbchat
 requests
