@@ -4,68 +4,64 @@ from routine_basics import *
 
 # returns dictionary of today & tomorrows routine
 def get_daily_routine(sheet, semester, section, day=get_day(datetime.datetime.now().weekday())):
-    try:
-        global start_row, end_row
-        section = section.upper()
-        routine = {}
-        rows_with_sub_names = [2, 5, 8, 11, 14, 17]
 
-        # day = "Monday"  # debug
+    start_row = None
+    end_row = None
+    section = section.upper()
+    routine = {}
+    rows_with_sub_names = [2, 5, 8, 11, 14, 17]
 
-        tomorrow = get_tomorrow(day)  # returns day name
+    # day = "Monday"  # debug
 
-        # print(f"Today = {day}")  # debug
-        # print(f"Tomorrow = {tomorrow}")  # debug
+    tomorrow = get_tomorrow(day)  # returns day name
 
-        row_length = len(sheet["A"])
-        # col_length = len(sheet[1])  # // 4
+    # print(f"Today = {day}")  # debug
+    # print(f"Tomorrow = {tomorrow}")  # debug
 
-        # print(row_length)  # debug
-        # print(col_length)  # debug
+    row_length = len(sheet["A"])
+    # col_length = len(sheet[1])  # // 4
 
-        # finding start and end row of today
-        row = 1
-        while row != row_length + 1:  # traversing rows from top-down
-            if sheet.cell(row=row, column=1).value == day:  # we found the day! day name always in first column(col=1)
-                start_row = row
-            if sheet.cell(row=row, column=1).value == tomorrow:  # we found the next day! This is where we stop
-                end_row = row
+    # print(row_length)  # debug
+    # print(col_length)  # debug
 
-            row += 1
+    # finding start and end row of today
+    row = 1
+    while row != row_length + 1:  # traversing rows from top-down
+        if sheet.cell(row=row, column=1).value == day:  # we found the day! day name always in first column(col=1)
+            start_row = row
+        if sheet.cell(row=row, column=1).value == tomorrow:  # we found the next day! This is where we stop
+            end_row = row
 
-        # print(start_row)  # debug
-        # print(end_row)  # debug
+        row += 1
 
-        dict_counter = 1
-        for a_row_with_sub_name in rows_with_sub_names:  # traversing columns with sub names from left-right
+    # print(start_row)  # debug
+    # print(end_row)  # debug
 
-            counter = start_row  # setting counter = start_row every time we finish a column & move to next time frame
+    dict_counter = 1
+    for a_row_with_sub_name in rows_with_sub_names:  # traversing columns with sub names from left-right
 
-            while counter < end_row:  # scan one time frame to see if there is a class in that time
+        counter = start_row  # setting counter = start_row every time we finish a column & move to next time frame
 
-                sub = sheet.cell(row=counter, column=a_row_with_sub_name).value
+        while counter < end_row:  # scan one time frame to see if there is a class in that time
 
-                # if semester == 1 and sub == "AOL101(A,B,D)" and section == "A" or "B" or "C":
-                # I forgot what I was doing here rip, but hey! it works...sort of.
-                if sub in get_subjects_with_section(subjects, semester, section):
-                    routine[dict_counter] = {}
+            sub = sheet.cell(row=counter, column=a_row_with_sub_name).value
 
-                    subject = sub
-                    time = sheet.cell(row=4, column=a_row_with_sub_name - 1).value
-                    room = sheet.cell(row=counter, column=a_row_with_sub_name - 1).value
-                    teacher = sheet.cell(row=counter, column=a_row_with_sub_name + 1).value
+            if sub in get_subjects_with_section(subjects, semester, section):
+                routine[dict_counter] = {}
 
-                    routine[dict_counter]["day"] = day
-                    routine[dict_counter]["time"] = time
-                    routine[dict_counter]["subject"] = subject
-                    routine[dict_counter]["room"] = room
-                    routine[dict_counter]["teacher"] = teacher
+                subject = sub
+                time = sheet.cell(row=4, column=a_row_with_sub_name - 1).value
+                room = sheet.cell(row=counter, column=a_row_with_sub_name - 1).value
+                teacher = sheet.cell(row=counter, column=a_row_with_sub_name + 1).value
 
-                    dict_counter += 1
+                routine[dict_counter]["day"] = day
+                routine[dict_counter]["time"] = time
+                routine[dict_counter]["subject"] = subject
+                routine[dict_counter]["room"] = room
+                routine[dict_counter]["teacher"] = teacher
 
-                counter += 1
+                dict_counter += 1
 
-    except:
-        routine = {}
+            counter += 1
 
     return routine

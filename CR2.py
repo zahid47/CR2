@@ -1,3 +1,5 @@
+import openpyxl
+from daily_routine import *
 from full_routine import *
 
 # opening an excel file and selecting the first sheet
@@ -25,16 +27,16 @@ while True:
 
 # getting section from user
 while True:
-    section = input("Enter section: ").lower()
-    if section not in ["a", "b", "c", "d"]:
-        print("Please enter a valid section (a/ b/ c/ d).")
+    section = input("Enter section: ").upper()
+    if section not in ["A", "B", "C", "D"]:
+        print("Please enter a valid section (A/ B/ C/ D).")
         continue
-    if section in ["a", "b", "c", "d"]:
+    if section in ["A", "B", "C", "D"]:
         break
 
 
 def main_get_daily_routine():
-    result = get_daily_routine(sheet, semester_no, section)
+    result = get_daily_routine(sheet, semester_no, section, day="Sunday")
     # pprint(result)
     print(f'You have {len(result)} class(es) today.')
     print("_____________")
@@ -47,10 +49,12 @@ def main_get_daily_routine():
 
 
 def main_get_full_routine():
-    routine = get_full_routine(sheet, 5, "b")
+    routine = get_full_routine(sheet, semester_no, section)
 
     with open("routine.csv", "w") as f:
         f.write(routine)
 
 
-main_get_daily_routine()
+# main_get_daily_routine()
+
+# main_get_full_routine()

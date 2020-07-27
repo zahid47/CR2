@@ -1,6 +1,6 @@
 # dictionary that contains sub codes, key = semester no., value = list of sub codes
 subjects = {
-    1: ["SE111", "SE112", "SE113", "ENG101"],  # TODO AOL will be added manually
+    1: ["SE111", "SE112", "SE113", "ENG101", "AOL101"],
     2: ["SE121", "SE122", "SE123", "MAT101", "PHY101"],
     3: ["SE131", "SE132", "SE133", "MAT102", "STA101"],
     4: ["SE211", "SE212", "SE213", "SE214", "SE215", "CS211"],
@@ -60,5 +60,14 @@ def get_subjects_with_section(subjects_list, semester, section):
     section = section.upper()
     subjects_with_section = []
     for subject in subjects_list[semester]:
+        if subject == "AOL101":
+            if section in ["A", "B", "D"]:
+                subjects_with_section.append("AOL101(A,B,D)")
+                continue
         subjects_with_section.append(subject + section)
     return subjects_with_section
+
+
+def get_sub_name(sub_code):
+    # TODO: create a function that takes subject code and returns subject name of that code
+    pass
