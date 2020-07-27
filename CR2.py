@@ -1,254 +1,42 @@
-import datetime
-import openpyxl
-# import fbchat
-from fbchat import Client
-from fbchat.models import *
-import requests
-from pprint import pprint
+from full_routine import *
 
-# opening an excel file and selecting the first sheet which is named "Sheet1"
-workbook = openpyxl.load_workbook("sample_routine2.xlsx")
+# opening an excel file and selecting the first sheet
+excel_file_name = "sample_routine.xlsx"
+sheet_name = "Sheet1"
+
+workbook = openpyxl.load_workbook(excel_file_name)
 # sheet = workbook["Sheet1"]
-sheet = workbook["Routine_Summer_20_V.01"]
+sheet = workbook[sheet_name]
 
-# dictionary that contains sub codes, key = semester no., value = list of sub codes
-subjects = {
-    1: ["SE111", "SE112", "SE113", "ENG101"],  # TODO AOL will be added manually
-    2: ["SE121", "SE122", "SE123", "MAT101", "PHY101"],
-    3: ["SE131", "SE132", "SE133", "MAT102", "STA101"],
-    4: ["SE211", "SE212", "SE213", "SE214", "SE215", "CS211"],
-    5: ["SE 221", "SE 222", "SE 223", "SE 224", "SE 225", "SE 226", "SE 532"],
-    6: ["SE 231", "SE 232", "SE 233", "SE 234", "SE 235"],
-    7: ["SE 225", "SE 226", "SE 311", "SE 312", "SE 313", "CS 312", "GED"],
-    8: ["SE 312", "SE 322", "SE 323", "SE 442", "SE 341", "CS 323"],
-    9: ["SWE412", "SWE331", "SWE423", "SWE424"],
-    10: ["SWE422", "SWE425", "SWE426", "SWE332"],
-    11: ["SWE411", "SWE439"],
-    12: []
-}
-
-
-def get_day(day_number):
-    if day_number == 0:
-        return "Monday"
-    elif day_number == 1:
-        return "Tuesday"
-    elif day_number == 2:
-        return "Wednesday"
-    elif day_number == 3:
-        return "Thursday"
-    elif day_number == 4:
-        return "Friday"
-    elif day_number == 5:
-        return "Saturday"
-    elif day_number == 6:
-        return "Sunday"
-
-
-def get_day_number(day):
-    if day == "Monday":
-        return 0
-    elif day == "Tuesday":
-        return 1
-    elif day == "Wednesday":
-        return 2
-    elif day == "Thursday":
-        return 3
-    elif day == "Friday":
-        return 4
-    elif day == "Saturday":
-        return 5
-    elif day == "Sunday":
-        return 6
-
-
-def get_tomorrow(day):
-    if day == "Sunday":
-        return "Monday"
-    else:
-        return get_day(get_day_number(day) + 1)
-
-
-def get_subjects_with_section(subjects_list, semester, section):
-    section = section.upper()
-    subjects_with_section = []
-    for subject in subjects_list[semester]:
-        subjects_with_section.append(subject + section)
-    return subjects_with_section
-
-
-# returns dictionary of today/ tomorrows routine
-def get_routine(semester, section, want_tomorrow=False, cs_major=False, day=get_day(datetime.datetime.now().weekday())):
+# getting semester no from user
+while True:
     try:
-        global start_row, end_row
-        section = section.upper()
-        routine = {}
-        rows_that_have_sub_names = [2, 5, 8, 11, 14, 17]
+        semester_no = int(input("Enter semester no (1-11): "))
+    except ValueError:
+        print("Please enter an integer.")
+        semester_no = 0
+        continue
 
-        # day = "Monday"  # debug
+    if not 0 < semester_no < 12:
+        print("Please enter a valid semester number (1-11). Semester 12 isn't supported yet.")
+        continue
+    if semester_no != 0:
+        break
 
-        if want_tomorrow:  # == True
-            day = get_day(datetime.datetime.now().weekday() + 1)
-
-        tomorrow = get_tomorrow(day)
-
-        # print(f"Today = {day}")  # debug
-        # print(f"Tomorrow = {tomorrow}")  # debug
-
-        row_length = len(sheet["A"])
-        # col_length = len(sheet[1])  # // 4
-
-        # print(row_length)  # debug
-        # print(col_length)  # debug
-
-        # finding start and end row of today
-        row = 1
-        while row != row_length + 1:  # traversing rows from top-down
-            if sheet.cell(row=row, column=1).value == day:  # we found the day! day name always in first column(col=1)
-                start_row = row
-            if sheet.cell(row=row, column=1).value == tomorrow:  # we found the next day! This is where we stop
-                end_row = row
-
-            row += 1
-
-        # print(start_row)  # debug
-        # print(end_row)  # debug
-
-        dict_counter = 1
-        for a_row_that_have_sub_name in rows_that_have_sub_names:  # traversing columns with sub names from left-right
-
-            counter = start_row  # setting counter = start_row every time we finish a column & move to next time frame
-
-            while counter < end_row:  # scan one time frame to see if there is a class in that time
-
-                sub = sheet.cell(row=counter, column=a_row_that_have_sub_name).value
-
-                # if semester == 1 and sub == "AOL101(A,B,D)" and section == "A" or "B" or "C":
-
-                if sub in get_subjects_with_section(subjects, semester, section):
-                    routine[dict_counter] = {}
-
-                    subject = sub
-                    time = sheet.cell(row=4, column=a_row_that_have_sub_name - 1).value
-                    room = sheet.cell(row=counter, column=a_row_that_have_sub_name - 1).value
-                    teacher = sheet.cell(row=counter, column=a_row_that_have_sub_name + 1).value
-
-                    routine[dict_counter]["day"] = day
-                    routine[dict_counter]["time"] = time
-                    routine[dict_counter]["subject"] = subject
-                    routine[dict_counter]["room"] = room
-                    routine[dict_counter]["teacher"] = teacher
-
-                    dict_counter += 1
-
-                counter += 1
-
-    except:
-        routine = {}
-
-    return routine
+# getting section from user
+while True:
+    section = input("Enter section: ").lower()
+    if section not in ["a", "b", "c", "d"]:
+        print("Please enter a valid section (a/ b/ c/ d).")
+        continue
+    if section in ["a", "b", "c", "d"]:
+        break
 
 
-# returns csv of the whole routine
-def get_full_routine(semester, section, cs_major=False):
-    start_row_full = 6
-    end_row_full = 102
-
-    section = section.upper()
-    rows_that_have_sub_names = [2, 5, 8, 11, 14, 17]
-    rows_that_have_day_names = [87, 70, 54, 38, 22, 6]  # column is always 1 [6, 22, 38, 54, 70, 87]
-
-    lineTime = ";08:30-10:00;10:00-11:30;11.30-01:00;01:00-2:30;2:30-4:00;4:00-5:30"
-    lineSaturday = "Saturday;"
-    lineSunday = "Sunday;"
-    lineMonday = "Monday;"
-    lineTuesday = "Tuesday;"
-    lineWednesday = "Wednesday;"
-    lineThursday = "Thursday;"
-    lineFriday = "Friday;"
-
-    for a_row_that_have_sub_name in rows_that_have_sub_names:  # traversing columns with sub names from left-right
-
-        counter = start_row_full  # setting counter = start_row every time we finish a column & move to next time frame
-
-        while counter < end_row_full:  # scan one time frame to see if there is a class in that time
-
-            sub = sheet.cell(row=counter, column=a_row_that_have_sub_name).value
-
-            row = counter
-            while row + 1 not in rows_that_have_day_names:
-                if row in rows_that_have_day_names:
-                    day = day = sheet.cell(row=row, column=1).value
-                    break
-                row -= 1
-
-            if sub in get_subjects_with_section(subjects, semester, section):
-                if day == "Monday":
-                    lineMonday = lineMonday + sub + " "
-                elif day == "Tuesday":
-                    lineTuesday = lineTuesday + sub + " "
-                elif day == "Wednesday":
-                    lineWednesday = lineWednesday + sub + " "
-                elif day == "Thursday":
-                    lineThursday = lineThursday + sub + " "
-                elif day == "Friday":
-                    lineFriday = lineFriday + sub + " "
-                elif day == "Saturday":
-                    lineSaturday = lineSaturday + sub + " "
-                elif day == "Sunday":
-                    lineSunday = lineSunday + sub + " "
-
-            counter += 1
-
-        lineMonday = lineMonday + ";"
-        lineTuesday = lineTuesday + ";"
-        lineWednesday = lineWednesday + ";"
-        lineThursday = lineThursday + ";"
-        lineFriday = lineFriday + ";"
-        lineSaturday = lineSaturday + ";"
-        lineSunday = lineSunday + ";"
-
-    routine = f"""{lineTime}
-{lineSaturday}
-{lineSunday}
-{lineMonday}
-{lineTuesday}
-{lineWednesday}
-{lineThursday}
-{lineFriday}"""
-
-    return routine
-
-
-def main_get_routine():
-    global want_tomorrow_ans
-    while True:
-        try:
-            semester_no = int(input("Enter semester no (1-11): "))
-        except ValueError:
-            print("Please enter an integer.")
-            semester_no = 0
-
-        if not 0 < semester_no < 12:
-            print("Please enter a valid semester number (1-11). Semester 12 isn't supported.")
-            continue
-        if semester_no != 0:
-            break
-
-    section = input("Enter section: ")
-
-    want_tom = input("Want tomorrow's routine? (yes or no): ").lower()
-    if want_tom == "yes":
-        want_tomorrow_ans = True
-    elif want_tom == "no":
-        want_tomorrow_ans = False
-    else:
-        print("Invalid input. Defaulted to 'no'")
-        want_tomorrow_ans = False
-
-    result = get_routine(semester_no, section, want_tomorrow=want_tomorrow_ans, day="Tuesday")
+def main_get_daily_routine():
+    result = get_daily_routine(sheet, semester_no, section)
     # pprint(result)
-    print(f'You have {len(result)} class(es).')
+    print(f'You have {len(result)} class(es) today.')
     print("_____________")
     for cls in range(1, len(result) + 1):
         print(f'Time: {result[cls]["time"]}')
@@ -257,33 +45,12 @@ def main_get_routine():
         print(f'Teacher: {result[cls]["teacher"]}')
         print("_____________")
 
-    # TODO downgrade to py 3.6 and add fbchat functionality
-    '''
-    # fbchat stuff
-    with open("email.txt") as email:
-        email = email.read()
-    with open("password.txt") as password:
-        password = password.read()
-    
-    client = Client(email, password)
-    
-    if not client.isLoggedIn():
-        client.login(email, password)
-    
-    # stuff here
-    
-    client.logout()
-    '''
-    get_full_routine(5, "b")
-    
-    
+
 def main_get_full_routine():
-    routine = get_full_routine(5, "b")
+    routine = get_full_routine(sheet, 5, "b")
 
     with open("routine.csv", "w") as f:
         f.write(routine)
 
 
-if __name__ == "__main__":
-    # main_get_routine()
-    main_get_full_routine()
+main_get_daily_routine()
