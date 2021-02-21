@@ -10,14 +10,14 @@ function Header() {
 				<Navbar.Toggle aria-controls="basic-navbar-nav" />
 				<Navbar.Collapse id="basic-navbar-nav">
 					<Nav className="ml-auto">
-						<Nav.Link href="#" target="_blank">
+						{/* <Nav.Link href="#" target="_blank">
 							Help
-						</Nav.Link>
+						</Nav.Link> */}
 						<Nav.Link href="https://github.com/zahid47/CR2" target="_blank">
-							Source
+							GitHub
 						</Nav.Link>
 						<Nav.Link
-							href="https://mail.google.com/mail/?view=cm&fs=1&to=epiczahid@gmail.com"
+							href="mailto:epiczahid@gmail.com"
 							target="_blank"
 						>
 							Contact

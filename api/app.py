@@ -20,12 +20,14 @@ class Routine(Resource):
         parser.add_argument("courses", type=str)
         args = parser.parse_args()
         courses = args["courses"]
+        
         # formatting courses to make it ready for get_simplified_routine() function
         courses = courses.replace(" ", "")
         courses = courses.upper()
         courses = courses.split(sep=",")
 
-        routine = get_simplified_routine(course_codes=courses, sheet="ROUTINE") # IMPORTANT need to change the sheet if they change it in xlsx file
+        # IMPORTANT need to change the sheet if they change it in xlsx file
+        routine = get_simplified_routine(course_codes=courses, sheet="ROUTINE")
         return routine
 
 
