@@ -1,0 +1,27 @@
+@import url("https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap");
+
+body {
+	font-family: "Nunito", sans-serif !important;
+}
+
+.white {
+	background-color: white;
+}
+
+.nav-link {
+	color: #000 !important;
+}
+
+.title-padding {
+	padding-top: 8%;
+}
+
+.my-form {
+	max-width: 65%;
+	padding: 15px;
+	margin: auto;
+}
+
+.btn-padding {
+	padding-bottom: 2%;
+}
