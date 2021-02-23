@@ -26,14 +26,18 @@ body {
 	padding-bottom: 2%;
 }
 
-.my-table {
+/* .my-table {
 	max-width: 80%;
 	padding: 15px;
 	margin: auto;
-}
+} */
 
-.table-caption {
+/* .table-caption {
 	max-width: 80%;
 	margin: auto;
 	padding-bottom: 5px;
+} */
+
+.sec-btn-padding {
+	padding-top: 10px;
 }
