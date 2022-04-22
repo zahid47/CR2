@@ -1,7 +1,6 @@
 <div align="center">
 
   <img src="frontend/public/logo.svg" alt="logo" width="200" height="auto" />
-  <h1>CR2</h1>
   
   <p>
     A web app that converts the complicated class routine of my university into a simplified one
@@ -20,6 +19,9 @@
 <div align="center"> 
   <img src="Screenshot.png" alt="screenshot" />
 </div>
+
+### Video Demo
+- [CR2 Demo](https://youtu.be/7HjKhImWrzE)
 
 <!-- TechStack -->
 
