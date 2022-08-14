@@ -6,7 +6,7 @@
     A web app that converts the complicated class routine of my university into a simplified one
   </p>
 
-  [Live Demo](https://cr2.netlify.app/)
+  [Live Demo](https://cr2.zahidtheduck.me/)
 
 </div>
 
