@@ -11,8 +11,7 @@ function App() {
 	//fetch routine from api
 	const fetchRoutine = async (courses) => {
 		setLoading(true); //setting loading to true when we are fetching the data
-		// const response = await fetch("https://cr2-api.herokuapp.com/", {
-		const response = await fetch("https://cr2-backend.herokuapp.com/", {
+		const response = await fetch("https://cr2-backend.onrender.com/", {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",
